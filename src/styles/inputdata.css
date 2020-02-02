@@ -31,3 +31,26 @@ label {
 .rupiah {
   margin-top: 7px;
 }
+
+.tableStyles {
+  width: 880px !important;
+  margin: 40px auto 0 auto;
+}
+
+.buttonStyles {
+  margin: 0 5px 0 5px;
+}
+
+.form-table {
+  width: 150px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+td {
+  width: 200px !important;
+}
+
+.rowHover:hover {
+  background: #f2f2f2;
+}

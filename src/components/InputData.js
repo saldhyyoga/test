@@ -1,25 +1,9 @@
 import React, { Component } from "react";
 
-import "../styles/inputdata.css";
+import Table from "./Table";
+import TotalMoney from "./TotalMoney";
 
-function TotalMoney(props) {
-  return (
-    <div className="totalMoney">
-      <div className="description">
-        Total Pemasukan
-        <div className="rupiah">{props.pemasukan}</div>
-      </div>
-      <div className="description">
-        Total Pengeluaran
-        <div className="rupiah">{props.pengeluaran}</div>
-      </div>
-      <div className="description">
-        Total Uang
-        <div className="rupiah">{props.totalUang}</div>
-      </div>
-    </div>
-  );
-}
+import "../styles/inputdata.css";
 
 export default class InputData extends Component {
   constructor(props) {
@@ -39,24 +23,15 @@ export default class InputData extends Component {
     };
   }
 
-  onChangeTipe = event => {
-    this.setState({
-      tipe: event.target.value
-    });
-  };
-
-  onChangeJumlah = event => {
-    this.setState({ jumlah: event.target.value });
-  };
-
-  onChangeJudul = event => {
-    this.setState({ judul: event.target.value });
+  onChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+    // console.log(this.state.jumlah, this.state.tipe, this.state.judul);
   };
 
   countMoney = event => {
     event.preventDefault();
     let items = {
-      // id: this.state.itemLists.length + 1,
+      id: this.state.itemLists.length + 1,
       tipe: this.state.tipe,
       jumlah: this.state.jumlah,
       judul: this.state.judul
@@ -72,32 +47,98 @@ export default class InputData extends Component {
       () => {
         if (this.state.tipe === "pengeluaran") {
           this.setState({
-            pengeluaran: this.state.pengeluaran + items.jumlah,
-            totalUang: this.state.totalUang - items.jumlah
+            pengeluaran:
+              parseInt(this.state.pengeluaran) + parseInt(items.jumlah),
+            totalUang: parseInt(this.state.totalUang) - parseInt(items.jumlah)
           });
         } else if (this.state.tipe === "pemasukan") {
           this.setState({
-            pemasukan: this.state.pemasukan + items.jumlah,
-            totalUang: this.state.totalUang + items.jumlah
+            pemasukan: parseInt(this.state.pemasukan) + parseInt(items.jumlah),
+            totalUang: parseInt(this.state.totalUang) + parseInt(items.jumlah)
           });
         }
       }
     );
 
-    console.log(this.state.itemLists);
-
-    // if (items.tipe === "pengeluaran") {
-    //   this.setState({ pengeluaran: items.jumlah });
-    // }
-    // console.log(this.state.pengeluaran);
-
-    // this.setState({ jumlah: "", tipe: "", judul: "" });
-
     // console.log(this.state.itemLists);
-    // console.log(this.state);
+  };
+
+  // function for amount pengeluaran,pemasukan dan total
+  amount = itemLists => {
+    let pengeluaran = 0,
+      pemasukan = 0,
+      total = 0;
+    for (let i = 0; i < itemLists.length; i++) {
+      if (itemLists[i].tipe === "pengeluaran") {
+        pengeluaran += parseInt(itemLists[i].jumlah);
+      } else if (itemLists[i].tipe === "pemasukan") {
+        pemasukan += parseInt(itemLists[i].jumlah);
+      }
+    }
+    total = pemasukan - pengeluaran;
+
+    this.setState({
+      pengeluaran: pengeluaran,
+      pemasukan: pemasukan,
+      totalUang: total
+    });
+  };
+
+  deleteItem = id => {
+    const itemLists = this.state.itemLists.filter(item => item.id !== id);
+    this.setState({ itemLists: itemLists });
+
+    this.amount(itemLists);
+  };
+
+  editItem = item => {
+    this.setState({
+      editing: true,
+      jumlah: item.jumlah,
+      tipe: item.tipe,
+      judul: item.judul
+    });
+  };
+
+  setEditing = value => {
+    this.setState({
+      editing: value,
+      judul: "",
+      jumlah: 0
+    });
+  };
+
+  updateItem = event => {
+    event.preventDefault();
+    const updatedTipe = this.state.tipe;
+    const updatedJumlah = parseInt(this.state.jumlah);
+    const updatedJudul = this.state.judul;
+    const updatedItems = Object.assign({}, this.state.items, {
+      tipe: updatedTipe,
+      jumlah: updatedJumlah,
+      judul: updatedJudul
+    });
+    console.log(updatedItems);
+    const itemLists = this.state.itemLists.map(itemList =>
+      itemList.id === this.state.items.id ? updatedItems : itemList
+    );
+    console.log(itemLists);
+    this.setState({ jumlah: 0, judul: "", itemLists: itemLists });
+    this.setEditing(false);
   };
 
   render() {
+    const {
+      judul,
+      tipe,
+      jumlah,
+      pengeluaran,
+      pemasukan,
+      totalUang,
+      items,
+      itemLists,
+      editing
+    } = this.state;
     return (
       <div>
         <h1>REACT TABUNGAN APP (CRUD)</h1>
@@ -106,10 +147,18 @@ export default class InputData extends Component {
           <form onSubmit={this.countMoney}>
             <div className="form-group col-md-4">
               <label>Tipe</label>
-              <select className="form-control" onChange={this.onChangeTipe}>
+              <select
+                className="form-control"
+                name="tipe"
+                onChange={this.onChange}
+              >
                 <option>Pilih</option>
-                <option value="pengeluaran">Pengeluaran</option>
-                <option value="pemasukan">Pemasukan</option>
+                <option value="pengeluaran" name="pengeluaran">
+                  Pengeluaran
+                </option>
+                <option value="pemasukan" name="pemasukan">
+                  Pemasukan
+                </option>
               </select>
             </div>
 
@@ -118,8 +167,8 @@ export default class InputData extends Component {
               <input
                 type="number"
                 className="form-control"
-                id="exampleFormControlInput1"
-                onChange={this.onChangeJumlah}
+                name="jumlah"
+                onChange={this.onChange}
                 value={this.state.jumlah}
               ></input>
             </div>
@@ -129,8 +178,8 @@ export default class InputData extends Component {
               <input
                 type="text"
                 className="form-control"
-                id="exampleFormControlInput1"
-                onChange={this.onChangeJudul}
+                name="judul"
+                onChange={this.onChange}
                 value={this.state.judul}
               ></input>
             </div>
@@ -142,9 +191,23 @@ export default class InputData extends Component {
         </div>
 
         <TotalMoney
-          pengeluaran={this.state.pengeluaran}
-          pemasukan={this.state.pemasukan}
-          totalUang={this.state.totalUang}
+          pengeluaran={pengeluaran}
+          pemasukan={pemasukan}
+          totalUang={totalUang}
+        />
+
+        <Table
+          items={items}
+          itemLists={itemLists}
+          editing={editing}
+          editItem={this.editItem}
+          tipe={tipe}
+          jumlah={jumlah}
+          judul={judul}
+          setEditing={this.setEditing}
+          deleteItem={this.deleteItem}
+          onChange={this.onChange}
+          updateItem={this.updateItem}
         />
       </div>
     );
