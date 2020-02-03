@@ -1,8 +1,8 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-====Notabene====
+**Note**
 when add data after add first data,please click tipe(pengeluaran or pemasukan) again
-================
+
 
 ## Available Scripts
 
