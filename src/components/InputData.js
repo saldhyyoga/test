@@ -10,7 +10,7 @@ export default class InputData extends Component {
     super(props);
 
     this.state = {
-      id: null,
+      id: 0,
       judul: "",
       tipe: "",
       jumlah: 0,
@@ -42,6 +42,7 @@ export default class InputData extends Component {
         jumlah: 0,
         judul: "",
         items: items,
+        id: items.id,
         itemLists: [...this.state.itemLists, items]
       },
       () => {
@@ -96,7 +97,8 @@ export default class InputData extends Component {
       editing: true,
       jumlah: item.jumlah,
       tipe: item.tipe,
-      judul: item.judul
+      judul: item.judul,
+      items: item
     });
   };
 
@@ -108,48 +110,28 @@ export default class InputData extends Component {
     });
   };
 
-  updateItem = id => {
-    // event.preventDefault();
+  updateItem = () => {
     const updatedTipe = this.state.tipe;
-    const updatedJumlah = parseInt(this.state.jumlah);
+    const updatedAmount = parseInt(this.state.jumlah);
     const updatedJudul = this.state.judul;
     const updatedItems = Object.assign({}, this.state.items, {
       tipe: updatedTipe,
-      jumlah: updatedJumlah,
+      jumlah: updatedAmount,
       judul: updatedJudul
     });
     console.log(updatedItems);
     const itemLists = this.state.itemLists.map(itemList =>
-      itemList.id === id ? updatedItems : itemList
+      itemList.id === this.state.items.id ? updatedItems : itemList
     );
     console.log(itemLists);
-    this.setState(
-      {
-        jumlah: this.state.jumlah + updatedJumlah,
-        judul: "",
-        itemLists: itemLists
-      },
-      () => {
-        if (updatedTipe === "pengeluaran") {
-          this.setState({
-            pemasukan: this.state.pemasukan - updatedJumlah,
-            pengeluaran: this.state.pengeluaran + updatedJumlah,
-            totalUang: this.state.totalUang - updatedJumlah
-          });
-        } else if (updatedTipe === "pemasukan") {
-          this.setState({
-            pemasukan: this.state.pemasukan + updatedJumlah,
-            pengeluaran: this.state.pengeluaran - updatedJumlah,
-            totalUang: this.state.totalUang + updatedJumlah
-          });
-        }
-      }
-    );
+    this.setState({ judul: "", jumlah: 0, itemLists: itemLists });
     this.setEditing(false);
+    this.amount(itemLists);
   };
 
   render() {
     const {
+      id,
       judul,
       tipe,
       jumlah,
@@ -218,6 +200,7 @@ export default class InputData extends Component {
         />
 
         <Table
+          id={id}
           items={items}
           itemLists={itemLists}
           editing={editing}

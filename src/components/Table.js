@@ -52,7 +52,7 @@ const Table = props => {
 
               <td>
                 <button
-                  onClick={() => props.updateItem(props.items.id)}
+                  onClick={props.updateItem}
                   type="button"
                   className="btn btn-success buttonStyles"
                 >
