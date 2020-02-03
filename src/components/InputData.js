@@ -108,8 +108,8 @@ export default class InputData extends Component {
     });
   };
 
-  updateItem = event => {
-    event.preventDefault();
+  updateItem = id => {
+    // event.preventDefault();
     const updatedTipe = this.state.tipe;
     const updatedJumlah = parseInt(this.state.jumlah);
     const updatedJudul = this.state.judul;
@@ -120,10 +120,31 @@ export default class InputData extends Component {
     });
     console.log(updatedItems);
     const itemLists = this.state.itemLists.map(itemList =>
-      itemList.id === this.state.items.id ? updatedItems : itemList
+      itemList.id === id ? updatedItems : itemList
     );
     console.log(itemLists);
-    this.setState({ jumlah: 0, judul: "", itemLists: itemLists });
+    this.setState(
+      {
+        jumlah: this.state.jumlah + updatedJumlah,
+        judul: "",
+        itemLists: itemLists
+      },
+      () => {
+        if (updatedTipe === "pengeluaran") {
+          this.setState({
+            pemasukan: this.state.pemasukan - updatedJumlah,
+            pengeluaran: this.state.pengeluaran + updatedJumlah,
+            totalUang: this.state.totalUang - updatedJumlah
+          });
+        } else if (updatedTipe === "pemasukan") {
+          this.setState({
+            pemasukan: this.state.pemasukan + updatedJumlah,
+            pengeluaran: this.state.pengeluaran - updatedJumlah,
+            totalUang: this.state.totalUang + updatedJumlah
+          });
+        }
+      }
+    );
     this.setEditing(false);
   };
 

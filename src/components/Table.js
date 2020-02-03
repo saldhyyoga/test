@@ -52,11 +52,11 @@ const Table = props => {
 
               <td>
                 <button
-                  onClick={props.updateItem}
+                  onClick={() => props.updateItem(props.items.id)}
                   type="button"
                   className="btn btn-success buttonStyles"
                 >
-                  Update
+                  Update{props.items.id}
                 </button>
                 <button
                   onClick={() => props.setEditing(false)}
